@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root {
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -23,4 +23,41 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+} */
+
+/* Navbar */
+.container{
+  margin: 0 auto;
+  min-width: 1200;
+  padding: 0.3rem;
+}
+.navbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #bebcbc;
+  padding: 0.5rem ;
+  
+}
+.logo{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.menuItems{
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  & a:hover{
+    color: #1ba022;
+  }
+}
+main{
+  background: #ebf5f7;
+  padding: 3rem 1rem;
 }
