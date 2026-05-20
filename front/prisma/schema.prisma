@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma" 
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// MODELS
+// Enum types
+enum Gender{
+  MALE
+  FEMALE
+}
+enum Role{
+  BASIC
+  ADMIN
+  JOB_SEEKER
+  EMPLOYER
+  AGENCY
+}
+enum Job_type{
+  FULLTIME
+  PARTIME
+  FREELANCE
+  REMOTE
+  HYBRID
+  CONTRACT
+}
+enum ApplicationStatus{
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+}
+enum CompanyType{
+  COMPANY
+  AGENCY
+}
+// Authentication models
+model Account{
+  id String @id @default(cuid())
+  userId String
+  type String
+  provider String
+  providerAccountId String
+  refresh_token String? @db.Text
+  access_token String? @db.Text
+  expires_at Int?
+  token_type String?
+  scope String?
+  id_token String? @db.Text
+  session_store String?
+
+  // Relations
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+
+  @@unique([provider,providerAccountId])
+}
+
+model Session{
+  id String  @id @default(cuid())
+  sessionToken String @unique
+  userId String
+  expires DateTime
+
+  // Relations
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+}
+
+model VerificationToken{
+  identifier String
+  token String @unique
+  expires DateTime
+  @@unique([ identifier,token])
+}
+
+// App specific models/tables
+model User{
+  id    String @id @default(cuid())
+  name String
+  email String @unique
+  emailVerified DateTime?
+  profileImage String?
+  gender Gender?
+  age Int?
+  isMarried Boolean?
+  nationality String?
+  role Role @default(BASIC)
+
+  // Relations
+  accounts Account[] //a user can have multiple accounts
+  sessions Session[] //a user can have multiple sessions
+  jobs Job[] @relation("JobPostedBy") //note when relation have label, you need to specify it in the other table
+  applications Application[]
+  
+  createdAt DateTime @default(now())
+}
+
+model Job{
+  id String @id @default(cuid())
+  postedById String
+  companyId String
+  title String
+  company String
+  location String
+  type Job_type
+  description String @db.Text
+  salary String?
+
+  postedAt DateTime @default(now())
+
+  // Relations
+  postedBy User @relation("JobPostedBy",fields: [postedById],references: [id], onDelete: Cascade)
+  hiringCompany Company @relation("hiringCompany",fields: [companyId],references: [id], onDelete: Cascade)
+  applications Application[]
+
+}
+
+model Application{
+  id String @id @default(cuid())
+  jobId String
+  userId String
+  status ApplicationStatus @default(PENDING)
+  AppliedAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  job Job @relation(fields: [jobId], references: [id],onDelete: Cascade)
+
+//  make sure user can apply only once to the job, using composite unique cosntraint(block level attribute)
+@@unique([userId,jobId])//to enforce uniquenes in the db
+}
+
+model Company{
+  id String @id @default(cuid())
+  name String
+  type CompanyType
+  description String @db.Text
+  bussinesType String?
+  email String @unique
+  phone String @unique
+  city String
+  country String
+  
+// Relations
+job Job @relation("hiringCompany")
+
+createdAt DateTime @default(now())
+
+}

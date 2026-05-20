@@ -14,8 +14,8 @@ const prisma = new PrismaClient({adapter});
 app.use(express.json());
 
 // ROUTES
-app.get('/users',async(req,res)=>{
-    /* Get single user
+app.get("/users", async (req, res) => {
+  /* Get single user
        const users = await prisma.user.findFirst();//returns the first record & retuns null if data is not found
        const users = await prisma.user.findFirstOrThrow(); // gets the 1st data and throws an error if data is not found
     // returns the  user  that fulfill the condition specified on unique field
@@ -23,9 +23,9 @@ app.get('/users',async(req,res)=>{
           // where:{name:'kenna'}, //error, hence "name" is NOT unique field
         where:{email:'kenna@gmail.com'}
      }); 
-    */ 
-    // Get multiple user
-    /*
+    */
+  // Get multiple user
+  /*
       const users = await prisma.user.findMany(); // returns all the data in the table
     // returns all married user
        const users = await prisma.user.findMany({
@@ -62,12 +62,29 @@ app.get('/users',async(req,res)=>{
     }); 
     res.json(users);
 */
- const allUsers= await prisma.user.findMany();
- console.log(allUsers);
-})
+  const allUsers = await prisma.user.findMany();
+  //  console.log(allUsers);
+});
 
 // Update
-app.
+app.put("/users", async (req, res) => {
+  const updatedUser = await prisma.user.update({
+    where: { email: "kenna@gmail.com" },
+    data: {
+      email: "kenna_b@gmail.com",
+      age: 9,
+    },
+  });
+  res.json(updatedUser);
+});
+
+// Delete
+app.delete("/users", async (req, res) => {
+  const deletedUser = await prisma.user.delete({
+    where: { email: "test@gmail.com" },
+  });
+  res.json(deletedUser);
+});
 
 
 const PORT = process.env.PORT || 5002
